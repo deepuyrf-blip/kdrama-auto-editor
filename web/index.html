@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>KDrama Auto Editor</title>
+<style>
+body{margin:0;background:#090b10;color:#f4f6fb;font-family:system-ui}
+.wrap{max-width:760px;margin:auto;padding:28px 16px}
+.card{background:#131720;border:1px solid #252b38;border-radius:20px;padding:24px}
+label{display:block;margin:18px 0 7px;font-weight:700}
+input,textarea,button{width:100%;box-sizing:border-box;border-radius:12px;border:1px solid #303747;background:#0c0f15;color:#fff;padding:13px}
+button{margin-top:20px;background:#fff;color:#090b10;font-weight:800;cursor:pointer}
+button:disabled{opacity:.55}
+#status{margin-top:18px}
+a{color:#8bd5ff}
+</style>
+</head>
+<body>
+<div class="wrap"><div class="card">
+<h1>🎬 KDrama Auto Editor</h1>
+<p>Raw video + Hindi voice + BGM + script → 9:16 Short</p>
+<form id="editorForm">
+<label>Raw video</label>
+<input name="video" type="file" accept="video/*" required>
+<label>Hindi voice-over</label>
+<input name="voice" type="file" accept="audio/*" required>
+<label>Background music</label>
+<input name="bgm" type="file" accept="audio/*" required>
+<label>Script</label>
+<textarea name="script" rows="8" placeholder="Paste Hindi narration script..."></textarea>
+<button id="submitButton" type="submit">Render Short</button>
+</form>
+<div id="status"></div>
+</div></div>
+<script>
+const form=document.getElementById("editorForm");
+const button=document.getElementById("submitButton");
+const status=document.getElementById("status");
+form.addEventListener("submit",async e=>{
+ e.preventDefault();
+ button.disabled=true;
+ status.textContent="⏳ Rendering... Original audio is muted and BGM is ducked.";
+ try{
+   const r=await fetch("/api/render",{method:"POST",body:new FormData(form)});
+   const d=await r.json();
+   if(!r.ok) throw new Error(d.detail||"Render failed");
+   status.innerHTML='✅ Done!<br><br><a href="'+d.download+'">Download final MP4</a>';
+ }catch(err){status.textContent="❌ "+err.message}
+ finally{button.disabled=false}
+});
+</script>
+</body>
+</html>

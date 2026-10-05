@@ -1,0 +1,11 @@
+services:
+  editor:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./uploads:/app/uploads
+      - ./outputs:/app/outputs
+    environment:
+      FFMPEG_BIN: ffmpeg
+      FFPROBE_BIN: ffprobe
